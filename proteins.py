@@ -5,14 +5,12 @@ Created on Sun May  6 21:27:27 2018
 
 @author: Tom
 """
-# HO HO HO!
 
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
-
 
 # Input a pdb file, e.g. '1mp6.pdb', output a list of lines containing atom information.
 def atom_list(file):
@@ -24,6 +22,15 @@ def atom_list(file):
             atoms.append(list)
     return atoms
 
+# Input a pdb file, output the name of the protein
+def protein_name(file):
+    data = open(file)
+    file_name = data.name
+    prot_name=''
+    for j in range(0,4):
+        prot_name=prot_name+file_name[j]
+    return prot_name
+            
 # Input a list of atom information, output list of float coordinates of CA atoms.
 def carbon_list(atoms):
     carbons=[]        
@@ -58,22 +65,11 @@ def plot_backbone(file):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     [x,y,z]=pdb2coords(file)
-    ax.plot(x, y, z, label='Protein Backbone')
+    prot_name = protein_name(file)
+    ax.plot(x, y, z, label=prot_name+' Backbone')
     ax.legend()
     plt.show()
 
-# plot smoothed backbone --- DOESN'T WORK!!!
-def smooth_backbone(file):
-    [x,y,z]=pdb2coords(file)
-    tck, u = interpolate.splprep([x,y,z], s=2)
-    u_fine = np.linspace(0,1,200)
-    [x_int, y_int, z_int] = interpolate.splev(u_fine, tck)
-    mpl.rcParams['legend.fontsize'] = 10
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot(x_int, y_int, z_int, label='Protein Backbone')
-    ax.legend()
-    plt.show()
 
 
 
