@@ -8,9 +8,7 @@ Created on Sun May  6 21:27:27 2018
 
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy import interpolate
 
 # Input a pdb file, e.g. '1mp6.pdb', output a list of lines containing atom information.
 def atom_list(file):
