@@ -78,14 +78,16 @@ def plot_backbone(file):
     ax.plot(x, y, z, label=prot_name+' Backbone')
     ax.legend()
     plt.show()
-    
+ 
+# Input pdb file *.pdb, output a txt file *.csv containing only backbone coords    
 def pdb_file_fixer(file):
     coords = pdb2coords(file)
     name = protein_name(file)
-    with open(name+".txt", "wb") as f:
+    with open(name+".csv", "wb") as f:
         writer = csv.writer(f)
         writer.writerows(coords)
 
+# Applies pdb_file_fixer to all files in a specified path.
 def pdb2coords_all_files(path):
     for file in os.listdir(path):
         pdb_file_fixer(file)
