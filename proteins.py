@@ -7,8 +7,8 @@ Created on Sun May  6 21:27:27 2018
 """
 
 import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import os
 import csv
 
@@ -16,7 +16,7 @@ import csv
 def atom_list(file):
     atoms=[]
     for line in open(file):
-        list=line.split()
+        list = line.split()
         id = list[0]
         if id == 'ATOM':
             atoms.append(list)
@@ -29,7 +29,12 @@ def check_for_repeats(atoms):
     if len(number_ones) > 1:
         atoms = atoms[0:number_ones[1]]
     return atoms
-    
+
+def number_of_samples(atoms):
+    atom_numbers = [entry[1] for entry in atoms]
+    number_ones = [i for i, x in enumerate(atom_numbers) if x == "1"]
+    return len(number_ones)
+
 # Input a pdb file, output the name of the protein
 def protein_name(file):
     data = open(file)
@@ -68,6 +73,29 @@ def pdb2coords(file):
     [x,y,z] = carbon_coords(atoms)
     return [x, y, z]
 
+def pdb2coords_all_samples(file):
+    atoms = atom_list(file)
+    [num_samp, num_carbons] = analyze_pdb(file)
+    sample_length = len(atoms)/num_samp
+    backbones = []
+    for j in range(0,num_samp):
+        atom_sample = atoms[j*sample_length:(j+1)*sample_length]
+        [x, y, z] = carbon_coords(atom_sample)
+        backbones.append([x, y, z])
+    return backbones
+
+########## Main Functions ############
+
+# Input pdb file, output some basic information
+def analyze_pdb(file):
+    atoms = atom_list(file)
+    carbon_atoms = carbon_list(check_for_repeats(atoms))
+    num_samp = number_of_samples(atoms)
+    num_carbons = len(carbon_atoms)
+    print "Number of samples: ", num_samp
+    print "Number of C-alpha atoms per sample: ", num_carbons
+    return [num_samp, num_carbons]
+
 # Input pdb file, produces plot of protein backbone.
 def plot_backbone(file):
     mpl.rcParams['legend.fontsize'] = 10
@@ -78,8 +106,19 @@ def plot_backbone(file):
     ax.plot(x, y, z, label=prot_name+' Backbone')
     ax.legend()
     plt.show()
- 
-# Input pdb file *.pdb, output a txt file *.csv containing only backbone coords    
+
+# Input pdb file, produces plots of all samples of the backbone.
+def plot_all_backbones(file):
+    mpl.rcParams['legend.fontsize'] = 10
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    backbones = pdb2coords_all_samples(file)
+    for j in range(0,len(backbones)):
+        [x,y,z] = backbones[j]
+        ax.plot(x, y, z)
+    plt.show()
+
+# Input pdb file *.pdb, output a txt file *.csv containing only backbone coords
 def pdb_file_fixer(file):
     coords = pdb2coords(file)
     name = protein_name(file)
