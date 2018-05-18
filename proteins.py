@@ -129,4 +129,5 @@ def pdb_file_fixer(file):
 # Applies pdb_file_fixer to all files in a specified path.
 def pdb2coords_all_files(path):
     for file in os.listdir(path):
-        pdb_file_fixer(file)
+        if '.pdb' in file:
+            pdb_file_fixer(file)
